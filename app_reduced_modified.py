@@ -13,7 +13,6 @@ Original file is located at
 # In[ ]:
 
 
-
 import streamlit as st
 import joblib
 import pandas as pd
@@ -114,7 +113,12 @@ input_df = pd.DataFrame({
 
 if st.button("Predict 10-Year CHD Risk"):
 
-      # --- Clinical Data Quality Checks (CDS safety feature) ---
+    if age < 30 and cigsPerDay > 20:
+        st.warning("Young patients with high smoking rates should be flagged for behavioral counseling.")
+    if age > 80 and totChol < 120:
+        st.warning("Unexpected low cholesterol for this age — verify lab accuracy.")
+
+
     warnings = []
     if totChol > 400:
         warnings.append("Total cholesterol is extremely high — verify lab result.")
@@ -123,9 +127,9 @@ if st.button("Predict 10-Year CHD Risk"):
     if glucose < 50 or glucose > 300:
         warnings.append("Glucose level is unusual — confirm with lab values.")
 
+
     for w in warnings:
         st.warning(w)
-
 
     probability = model.predict_proba(input_df)[0, 1]
     risk_percent = probability * 100
